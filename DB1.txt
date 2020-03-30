@@ -1,0 +1,86 @@
+from tkinter import *
+from tkinter import messagebox
+import sqlite3
+
+conn=sqlite3.connect("Ticket_Booking.db")
+c1=conn.cursor()
+
+'''c1.execute('CREATE TABLE info (full_name varchar,mobile_no integer,email varchar,artist varchar)')'''
+
+def submit():
+    conn=sqlite3.connect("Ticket_Booking.db")
+    c1=conn.cursor()
+    
+    c1.execute("INSERT INTO info VALUES (:f_name, :mob, :email, :artist)",{'f_name' : str(f_name.get()),'mob' : int(mob.get()),'email' : str(email.get()),'artist' : str(default.get())})
+    c1.execute('SELECT * FROM info')
+    records=c1.fetchall()
+    for i in records:
+        print(i)
+    conn.commit()
+    conn.close()
+    messagebox.showinfo("Successfull","Your data has been recorded")
+    
+    top=Toplevel()
+    top.title("Ticket")
+    top.config(bg="grey")
+    top.geometry('1300x700')
+    F2=Frame(top, bg="red", highlightbackground="black", highlightcolor="black", highlightthickness=3, width=400, height=300)
+    F2.place(x=400, y=300)
+    
+    Label(F2, text="****TICKET****", bg="black", fg="white", font="Verdana 20 bold", width=40).pack(anchor='c')
+
+    x='Name : '+str(f_name.get())
+    Label(F2, text=x, font="Helvetica 16 italic",bg="red").pack(anchor='w')
+    x='Mobile Number : '+str(mob.get())
+    Label(F2, text=x, font="Helvetica 16 italic",bg="red").pack(anchor='w')
+    x='Email : '+str(email.get())
+    Label(F2, text=x, font="Helvetica 16 italic",bg="red").pack(anchor='w')
+    x='Artist : '+str(default.get())
+    Label(F2, text=x, font="Helvetica 16 italic",bg="red").pack(anchor='w')
+
+    Button(F2, text= "Ok", font=20, command= top.destroy, fg='white', bg='black', width=20).pack(anchor='c')
+    LT=Label(F2, text="T&C applied.", font="Times", bg="red")
+    LT.pack(anchor=SE)
+
+    messagebox.showinfo("Congratulations!","Your ticket has been generated. Please take a screenshot and save it for further references!")
+
+    f_name.delete(0, END)
+    mob.delete(0, END)
+    email.delete(0, END)
+
+root=Tk()
+root.title("BOOK A TICKET")
+root.config(bg="black")
+
+F1=Frame(root,height=400,width=400,bg="grey")
+F1.grid()
+
+
+f_name= Entry(F1, width=30)
+f_name.grid(row=0, column=1,padx=20, pady=20, ipady=15)
+mob= Entry(F1, width=30)
+mob.grid(row=1, column=1,padx=20, pady=20, ipady=15)
+email= Entry(F1, width=30)
+email.grid(row=2, column=1,padx=20, pady=20, ipady=15)
+
+f_label=Label(F1, text="Full Name:",font=20)
+f_label.grid(row=0, column=0,sticky=W, pady=20)
+m_label=Label(F1, text="Mobile Number:",font=20)
+m_label.grid(row=1, column=0, pady=20,sticky=W)
+e_label=Label(F1, text="Email:",font=20)
+e_label.grid(row=2, column=0, sticky=W, pady=20)
+
+default = StringVar()
+
+choices = { 'Hardwell','Martin Garrix','Tiesto','Marshmello','Nucleya'}
+default.set('Select any Artist')
+Dropdown = OptionMenu(F1, default, *choices)
+Label(F1, text="Choose an artist:", font=20).grid(row = 3, column = 0,pady=10,sticky=W)
+Dropdown.grid(row = 3, column =1,padx=5,sticky=W)
+
+sub=Button(F1, text="Submit And View", command=submit,font=20)
+sub.grid(row=4,column=0,columnspan=2,pady=10,padx=20,ipadx=100)
+
+conn.commit()
+conn.close()
+mainloop()
